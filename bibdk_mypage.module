@@ -1,0 +1,161 @@
+<?php
+
+/**
+ * @file
+ * Create a profile2 tab that give the user an overview of the user's tabs.
+ */
+
+/**
+ * Implements user_profile_tabs (
+ * @see ding_user.module)
+ */
+function bibdk_mypage_user_profile2_tabs() {
+  $ret = new stdClass();
+  $ret->label = t('My page');
+  $ret->form = 'bibdk_mypage_form';
+  $ret->type = 'bibdk_mypage';
+  return $ret;
+}
+
+/**
+ * Implements hook_menu().
+ * Sets up menu items.
+ */
+function bibdk_mypage_menu() {
+  $items = array();
+  $items['admin/config/people/bibdk_mypage'] = array(
+    'title' => 'Bibliotek.dk : User frontpage settings',
+    'description' => 'Settings for the user\'s overview page',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('bibdk_mypage_admin'),
+    'access arguments' => array('administer users'),
+    'file' => 'bibdk_mypage.admin.inc',
+  );
+  return $items;
+}
+
+
+/**
+ * Implements hook_profile2_view
+ */
+function bibdk_mypage_profile2_view($profile, $view_mode, $langcode) {
+  //
+}
+
+
+/**
+ * Collect a fieldset from each module that call hook_bibdk_mypage_tabs.
+ *
+ * @param type $form
+ */
+function bibdk_mypage_form($form) {
+
+  $form = module_invoke_all('bibdk_mypage_tabs');
+
+  return $form;
+}
+
+
+/**
+ * Implements hook_bibdk_mypage_tabs().
+ */
+function bibdk_mypage_bibdk_mypage_tabs() {
+  return _bibdk_mypage_form();
+}
+
+
+/**
+ * Implements hook_theme().
+ */
+function bibdk_mypage_theme() {
+  $path = drupal_get_path('module', 'bibdk_mypage') . '/theme';
+  $bibdk_mypage_theme_array = array(
+    'bibdk_mypage-form' => array(
+      'render element'  => 'form',
+      'path'            => $path,
+      'template'        => 'bibdk_mypage-form',
+    ),
+  );
+  return $bibdk_mypage_theme_array;
+}
+
+
+/**
+ * Build bibdk_mypage form.
+ */
+function _bibdk_mypage_form() {
+  global $user;
+  $logged_in = $user->uid;
+
+  $form['bibdk_mypage'] = array(
+    '#type'         => 'fieldset',
+    '#title'        => t('Settings'),
+    '#title_display'  => 'invisible',
+    '#tree'         => TRUE,
+    '#theme'        => 'bibdk_mypage-form',
+    '#attributes'   => array('class' => array('element-wrapper', 'bibdk-mypage-wrapper')),
+  );
+
+  $form['bibdk_mypage']['header'] = array(
+    '#type'           => 'markup',
+    '#markup'         => t('Settings'),
+    '#prefix'         => '<h2>',
+    '#suffix'         => '</h2>',
+  );
+
+  $form['bibdk_mypage']['rows'] = array(
+    '#type'         => 'fieldset',
+    '#title'        => t('Rows'),
+    '#title_display'  => 'invisible',
+    '#tree'         => TRUE,
+  );
+
+  $form['bibdk_mypage']['rows'][0]['label_row'] = array(
+    '#type'           => 'markup',
+    '#markup'         => t('Language'),
+    '#prefix'         => '<p>',
+    '#suffix'         => '</p>',
+  );
+  $form['bibdk_mypage']['rows'][0]['value_row'] = array(
+    '#type'           => 'markup',
+    '#markup'          => t('Danish'),
+    '#prefix'         => '<p>',
+    '#suffix'         => '</p>',
+  );
+
+  $form['bibdk_mypage']['rows'][1]['label_row'] = array(
+    '#type'           => 'markup',
+    '#markup'         => t('Material type'),
+    '#prefix'         => '<p>',
+    '#suffix'         => '</p>',
+  );
+  $form['bibdk_mypage']['rows'][1]['value_row'] = array(
+    '#type'           => 'markup',
+    '#markup'          => t('All'),
+    '#prefix'         => '<p>',
+    '#suffix'         => '</p>',
+  );
+
+  $form['bibdk_mypage']['rows'][1]['label_row'] = array(
+    '#type'           => 'markup',
+    '#markup'         => t('Search result format'),
+    '#prefix'         => '<p>',
+    '#suffix'         => '</p>',
+  );
+  $form['bibdk_mypage']['rows'][1]['value_row'] = array(
+    '#type'           => 'markup',
+    '#markup'          => t('Kollapsed'),
+    '#prefix'         => '<p>',
+    '#suffix'         => '</p>',
+  );
+
+  $form['bibdk_mypage']['link_setting'] = array(
+    '#type'           => 'link',
+    '#title'          => t('Edit settings'),
+    '#title_display'  => 'invisible',
+    '#href'           => 'user/' . $user->uid . '/edit',
+    '#options'        => array('attributes' => array('title' => t('Edit settings.'))),
+  );
+
+  return $form;
+}
