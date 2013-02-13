@@ -1,6 +1,9 @@
 <?php
 
 function bibdk_mypage_admin() {
+
+  $modules = module_implements('bibdk_mypage_tabs'); // for later: order of tabs
+
   $form['search_history_save_limit'] = array(
     '#type' => 'textfield',
     '#title' => t('Maximum number of items in each tab'),
@@ -15,6 +18,7 @@ function bibdk_mypage_admin() {
     '#submit' => array('bibdk_mypage_admin_submit'),
     '#value' => t('Save'),
   );
+
   return $form;
 }
 

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Create a profile2 tab that give the user an overview of the user's tabs.
+ * Create a profile2 tab that provide a hook for other modules to supply an overview of the user's data.
  */
 
 /**
@@ -44,13 +44,14 @@ function bibdk_mypage_profile2_view($profile, $view_mode, $langcode) {
 
 
 /**
- * Collect a fieldset from each module that call hook_bibdk_mypage_tabs.
+ * Collect a fieldset from each module that implement hook_bibdk_mypage_tabs.
  *
  * @param type $form
  */
 function bibdk_mypage_form($form) {
 
-  $form = module_invoke_all('bibdk_mypage_tabs');
+  $max_rows = variable_get('bibdk_mypage_max_items', 4);
+  $form = module_invoke_all('bibdk_mypage_tabs',$max_rows);
 
   return $form;
 }
@@ -83,14 +84,12 @@ function bibdk_mypage_theme() {
 /**
  * Build bibdk_mypage form.
  */
-function _bibdk_mypage_form() {
+function _bibdk_mypage_form($max_rows=3) {
   global $user;
-  $logged_in = $user->uid;
+  $languages = language_list('enabled');
 
   $form['bibdk_mypage'] = array(
     '#type'         => 'fieldset',
-    '#title'        => t('Settings'),
-    '#title_display'  => 'invisible',
     '#tree'         => TRUE,
     '#theme'        => 'bibdk_mypage-form',
     '#attributes'   => array('class' => array('element-wrapper', 'bibdk-mypage-wrapper')),
@@ -98,63 +97,29 @@ function _bibdk_mypage_form() {
 
   $form['bibdk_mypage']['header'] = array(
     '#type'           => 'markup',
-    '#markup'         => t('Settings'),
-    '#prefix'         => '<h2>',
-    '#suffix'         => '</h2>',
+    '#markup'         => t('Account'),
   );
 
   $form['bibdk_mypage']['rows'] = array(
     '#type'         => 'fieldset',
-    '#title'        => t('Rows'),
-    '#title_display'  => 'invisible',
     '#tree'         => TRUE,
   );
 
   $form['bibdk_mypage']['rows'][0]['label_row'] = array(
     '#type'           => 'markup',
     '#markup'         => t('Language'),
-    '#prefix'         => '<p>',
-    '#suffix'         => '</p>',
   );
   $form['bibdk_mypage']['rows'][0]['value_row'] = array(
     '#type'           => 'markup',
-    '#markup'          => t('Danish'),
-    '#prefix'         => '<p>',
-    '#suffix'         => '</p>',
+    '#markup'         => $languages[1][$user->language]->native,
   );
 
-  $form['bibdk_mypage']['rows'][1]['label_row'] = array(
-    '#type'           => 'markup',
-    '#markup'         => t('Material type'),
-    '#prefix'         => '<p>',
-    '#suffix'         => '</p>',
-  );
-  $form['bibdk_mypage']['rows'][1]['value_row'] = array(
-    '#type'           => 'markup',
-    '#markup'          => t('All'),
-    '#prefix'         => '<p>',
-    '#suffix'         => '</p>',
-  );
-
-  $form['bibdk_mypage']['rows'][1]['label_row'] = array(
-    '#type'           => 'markup',
-    '#markup'         => t('Search result format'),
-    '#prefix'         => '<p>',
-    '#suffix'         => '</p>',
-  );
-  $form['bibdk_mypage']['rows'][1]['value_row'] = array(
-    '#type'           => 'markup',
-    '#markup'          => t('Kollapsed'),
-    '#prefix'         => '<p>',
-    '#suffix'         => '</p>',
-  );
-
-  $form['bibdk_mypage']['link_setting'] = array(
+  $form['bibdk_mypage']['link_profile2_tab'] = array(
     '#type'           => 'link',
     '#title'          => t('Edit settings'),
     '#title_display'  => 'invisible',
     '#href'           => 'user/' . $user->uid . '/edit',
-    '#options'        => array('attributes' => array('title' => t('Edit settings.'))),
+    '#options'        => array('attributes' => array('title' => t('Edit settings'))),
   );
 
   return $form;
