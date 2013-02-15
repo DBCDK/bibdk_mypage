@@ -17,12 +17,12 @@ function bibdk_mypage_user_profile2_tabs() {
   return $ret;
 }
 
+
 /**
  * Implements hook_menu().
  * Sets up menu items.
  */
 function bibdk_mypage_menu() {
-  $items = array();
   $items['admin/config/people/bibdk_mypage'] = array(
     'title' => 'Bibliotek.dk : User frontpage settings',
     'description' => 'Settings for the user\'s overview page',
@@ -42,18 +42,10 @@ function bibdk_mypage_menu() {
  */
 function bibdk_mypage_form($form) {
 
-  $max_rows = variable_get('bibdk_mypage_max_items', 4);
+  $max_rows = variable_get('bibdk_mypage_max_items', 3);
   $form = module_invoke_all('bibdk_mypage_tabs',$max_rows);
 
   return $form;
-}
-
-
-/**
- * Implements hook_bibdk_mypage_tabs().
- */
-function bibdk_mypage_bibdk_mypage_tabs() {
-  return _bibdk_mypage_form();
 }
 
 
@@ -84,7 +76,7 @@ function bibdk_mypage_menu_alter(&$items) {
 
 
 /**
- * callback for /user. See hook_menu_alter()
+ * callback for /user. See bibdk_mypage_menu_alter()
  */
 function _bibdk_mypage_user_page() {
   global $user;
@@ -99,9 +91,9 @@ function _bibdk_mypage_user_page() {
 
 
 /**
- * Build bibdk_mypage form.
+ * Implements hook_bibdk_mypage_tabs().
  */
-function _bibdk_mypage_form($max_rows=3) {
+function bibdk_mypage_bibdk_mypage_tabs($max_rows) {
   global $user;
   $languages = language_list('enabled');
 
@@ -128,7 +120,7 @@ function _bibdk_mypage_form($max_rows=3) {
   );
   $form['bibdk_mypage']['rows'][0]['value_row'] = array(
     '#type'           => 'markup',
-    '#markup'         => $languages[1][$user->language]->native,
+    '#markup'         => ( isset($languages[1][$user->language]->native) ) ? $languages[1][$user->language]->native : t('undefined'),
   );
 
   $form['bibdk_mypage']['link_profile2_tab'] = array(
