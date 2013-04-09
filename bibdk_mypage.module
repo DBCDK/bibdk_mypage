@@ -120,7 +120,7 @@ function bibdk_mypage_bibdk_mypage_tabs($max_rows) {
   );
   $form['bibdk_mypage']['rows'][0]['value_row'] = array(
     '#type'           => 'markup',
-    '#markup'         => ( isset($languages[1][$user->language]->native) ) ? $languages[1][$user->language]->native : t('undefined'),
+    '#markup'         => ( isset($languages) && isset($languages[1][$user->language]->native) ) ? $languages[1][$user->language]->native : t('undefined'),
   );
 
   $form['bibdk_mypage']['link_profile2_tab'] = array(
