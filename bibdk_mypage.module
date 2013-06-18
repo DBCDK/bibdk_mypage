@@ -17,7 +17,6 @@ function bibdk_mypage_user_profile2_tabs() {
   return $ret;
 }
 
-
 /**
  * Implements hook_menu().
  * Sets up menu items.
@@ -34,7 +33,6 @@ function bibdk_mypage_menu() {
   return $items;
 }
 
-
 /**
  * Collect a fieldset from each module that implement hook_bibdk_mypage_tabs.
  *
@@ -43,11 +41,70 @@ function bibdk_mypage_menu() {
 function bibdk_mypage_form($form) {
 
   $max_rows = variable_get('bibdk_mypage_max_items', 3);
-  $form = module_invoke_all('bibdk_mypage_tabs',$max_rows);
-
+  $my_pages = module_invoke_all('bibdk_mypage_tabs',$max_rows);
+  
+  foreach ($my_pages as $key => $my_page) {
+    $form[$key] = bibdk_my_page_customize_form_elements($my_page);
+  }
   return $form;
 }
 
+function bibdk_my_page_customize_form_elements($my_page) {
+  $form = array(
+    '#type' => 'fieldset',
+    '#attributes' => array('class' => array('element-wrapper', 'bibdk-mypage-wrapper')),
+  );
+
+  if (isset($my_page['attached'])) {
+    $form['#attached'] = $my_page['attached'];
+  }
+
+  $form['header'] = array(
+    '#type' => 'markup',
+    '#markup' => $my_page['header'],
+    '#prefix' => '<h2>',
+    '#suffix' => '</h2>',
+  );
+
+  $form['rows'] = array(
+    '#type' => 'container',
+  );
+
+  if (isset($my_page['rows']['attributes'])) {
+    $form['rows']['#attributes'] = $my_page['rows']['attributes'];
+  }
+
+  if (is_Array($my_page['rows']['values'])) {
+    foreach ($my_page['rows']['values'] as $values) {
+      foreach ($values as $key => $val) {
+        $row[$key] = array(
+          '#type' => 'markup',
+          '#markup' => '<p class="' . drupal_html_class($key) . '">' . $val . '</p>',
+        );
+      }
+      $row['#prefix'] = '<div class="bibdk-mypage-row clearfix">';
+      $row['#suffix'] = '</div>';
+      $rows[] = $row;
+    }
+    $form['rows']['values'] = $rows;
+  }
+
+
+  if (isset($my_page['link'])) {
+    $form['link'] = array(
+      '#type' => 'container',
+      '#attributes' => array('class' => array('bibdk-mypage-link')),
+    );
+    $form['link']['link_profile2_tab'] = array(
+      '#type' => 'link',
+      '#title' => $my_page['link']['title'],
+      '#title_display' => 'invisible',
+      '#href' => $my_page['link']['href'],
+      '#options' => array('attributes' => array('title' => $my_page['link']['title'])),
+    );
+  }
+  return $form;
+}
 
 /**
  * Implements hook_theme().
@@ -56,14 +113,13 @@ function bibdk_mypage_theme() {
   $path = drupal_get_path('module', 'bibdk_mypage') . '/theme';
   $bibdk_mypage_theme_array = array(
     'bibdk_mypage-form' => array(
-      'render element'  => 'form',
-      'path'            => $path,
-      'template'        => 'bibdk_mypage-form',
+      'render element' => 'form',
+      'path' => $path,
+      'template' => 'bibdk_mypage-form',
     ),
   );
   return $bibdk_mypage_theme_array;
 }
-
 
 /**
  * Implements hook_menu_alter().
@@ -73,7 +129,6 @@ function bibdk_mypage_menu_alter(&$items) {
   $items['user']['file'] = 'bibdk_mypage.module';
   $items['user']['module'] = 'bibdk_mypage';
 }
-
 
 /**
  * callback for /user. See bibdk_mypage_menu_alter()
@@ -89,47 +144,28 @@ function _bibdk_mypage_user_page() {
   }
 }
 
-
 /**
  * Implements hook_bibdk_mypage_tabs().
  */
 function bibdk_mypage_bibdk_mypage_tabs($max_rows) {
   global $user;
+  
+  $ret = array();
+  $ret['bibdk_mypage']['header'] = t('Account');
+  $ret['bibdk_mypage']['rows']['values'] = bibdk_mypage_my_page_get_rows($max_rows);
+  $ret['bibdk_mypage']['link'] = array(
+    'title' => t('Edit settings'),
+    'href' => 'user/' . $user->uid . '/edit',
+  );
+  return $ret;
+}
+
+function bibdk_mypage_my_page_get_rows($max_rows){
+  global $user;
   $languages = language_list('enabled');
-
-  $form['bibdk_mypage'] = array(
-    '#type'         => 'fieldset',
-    '#tree'         => TRUE,
-    '#theme'        => 'bibdk_mypage-form',
-    '#attributes'   => array('class' => array('element-wrapper', 'bibdk-mypage-wrapper')),
-  );
-
-  $form['bibdk_mypage']['header'] = array(
-    '#type'           => 'markup',
-    '#markup'         => t('Account'),
-  );
-
-  $form['bibdk_mypage']['rows'] = array(
-    '#type'         => 'fieldset',
-    '#tree'         => TRUE,
-  );
-
-  $form['bibdk_mypage']['rows'][0]['label_row'] = array(
-    '#type'           => 'markup',
-    '#markup'         => t('Language'),
-  );
-  $form['bibdk_mypage']['rows'][0]['value_row'] = array(
-    '#type'           => 'markup',
-    '#markup'         => ( isset($languages) && isset($languages[1][$user->language]->native) ) ? $languages[1][$user->language]->native : t('undefined'),
-  );
-
-  $form['bibdk_mypage']['link_profile2_tab'] = array(
-    '#type'           => 'link',
-    '#title'          => t('Edit settings'),
-    '#title_display'  => 'invisible',
-    '#href'           => 'user/' . $user->uid . '/edit',
-    '#options'        => array('attributes' => array('title' => t('Edit settings'))),
-  );
-
-  return $form;
+  $ret[] = array(
+      'label_row' => t('Language'),
+      'value_row' => ( isset($languages) && isset($languages[1][$user->language]->native) ) ? $languages[1][$user->language]->native : t('undefined'),
+    );
+  return $ret;
 }
