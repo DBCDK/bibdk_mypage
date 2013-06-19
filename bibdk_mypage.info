@@ -2,9 +2,9 @@ name = Bibdk 'my page'
 description = Create a profile2 tab that provide a hook, for other modules to supply an overview of the user's data.
 package = Bibliotek.dk
 core = 7.x
-version = 7.x-0.2.1
+version = 7.x-0.3
 
-dependancies[] = profile2
+dependencies[] = profile2
 
 files[] = test/bibdk_mypage.test
 files[] = bibdk_mypage.api.php
