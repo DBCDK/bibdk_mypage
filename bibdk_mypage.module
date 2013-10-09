@@ -94,11 +94,14 @@ function bibdk_my_page_customize_form_elements($my_page) {
     $form['rows']['values'] = $rows;
   }
 
-
   if (isset($my_page['link'])) {
     $form['link'] = array(
       '#type' => 'container',
-      '#attributes' => array('class' => array('bibdk-mypage-link')),
+      '#attributes' => array(
+        'class' => array(
+          'bibdk-mypage-link',
+        ),
+      ),
     );
     $form['link']['link_profile2_tab'] = array(
       '#type' => 'link',
@@ -108,6 +111,9 @@ function bibdk_my_page_customize_form_elements($my_page) {
       '#options' => array(
         'attributes' => array(
           'title' => $my_page['link']['title'],
+          'id' => array(
+            'selid-mypage-' . drupal_html_id($my_page['header'])
+          ),
         ),
       ),
     );
