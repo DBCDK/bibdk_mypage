@@ -41,8 +41,8 @@ function bibdk_mypage_menu() {
 function bibdk_mypage_form($form) {
 
   $max_rows = variable_get('bibdk_mypage_max_items', 3);
-  $my_pages = module_invoke_all('bibdk_mypage_tabs',$max_rows);
-  
+  $my_pages = module_invoke_all('bibdk_mypage_tabs', $max_rows);
+
   foreach ($my_pages as $key => $my_page) {
     $form[$key] = bibdk_my_page_customize_form_elements($my_page);
   }
@@ -52,7 +52,12 @@ function bibdk_mypage_form($form) {
 function bibdk_my_page_customize_form_elements($my_page) {
   $form = array(
     '#type' => 'fieldset',
-    '#attributes' => array('class' => array('element-wrapper', 'bibdk-mypage-wrapper')),
+    '#attributes' => array(
+      'class' => array(
+        'element-wrapper',
+        'bibdk-mypage-wrapper'
+      )
+    ),
   );
 
   if (isset($my_page['attached'])) {
@@ -100,7 +105,11 @@ function bibdk_my_page_customize_form_elements($my_page) {
       '#title' => $my_page['link']['title'],
       '#title_display' => 'invisible',
       '#href' => $my_page['link']['href'],
-      '#options' => array('attributes' => array('title' => $my_page['link']['title'])),
+      '#options' => array(
+        'attributes' => array(
+          'title' => $my_page['link']['title'],
+        ),
+      ),
     );
   }
   return $form;
@@ -149,7 +158,7 @@ function _bibdk_mypage_user_page() {
  */
 function bibdk_mypage_bibdk_mypage_tabs($max_rows) {
   global $user;
-  
+
   $ret = array();
   $ret['bibdk_mypage']['header'] = t('Account');
   $ret['bibdk_mypage']['rows']['values'] = bibdk_mypage_my_page_get_rows($max_rows);
@@ -160,12 +169,12 @@ function bibdk_mypage_bibdk_mypage_tabs($max_rows) {
   return $ret;
 }
 
-function bibdk_mypage_my_page_get_rows($max_rows){
+function bibdk_mypage_my_page_get_rows($max_rows) {
   global $user;
   $languages = language_list('enabled');
   $ret[] = array(
-      'label_row' => t('Language'),
-      'value_row' => ( isset($languages) && isset($languages[1][$user->language]->native) ) ? $languages[1][$user->language]->native : t('undefined'),
-    );
+    'label_row' => t('Language'),
+    'value_row' => (isset($languages) && isset($languages[1][$user->language]->native)) ? $languages[1][$user->language]->native : t('undefined'),
+  );
   return $ret;
 }
