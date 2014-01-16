@@ -1,23 +1,6 @@
 <?php
 
 /**
- * @file
- * Create a profile2 tab that provide a hook for other modules to supply an overview of the user's data.
- */
-
-/**
- * Implements user_profile_tabs (
- * @see ding_user.module)
- */
-function bibdk_mypage_user_profile2_tabs() {
-  $ret = new stdClass();
-  $ret->label = t('My page');
-  $ret->form = 'bibdk_mypage_form';
-  $ret->type = 'bibdk_mypage';
-  return $ret;
-}
-
-/**
  * Implements hook_menu().
  * Sets up menu items.
  */
