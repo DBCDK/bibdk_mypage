@@ -26,6 +26,8 @@ function bibdk_mypage_form($form) {
   $max_rows = variable_get('bibdk_mypage_max_items', 3);
   $my_pages = module_invoke_all('bibdk_mypage_tabs', $max_rows);
 
+  uasort($my_pages, 'drupal_sort_weight');
+
   foreach ($my_pages as $key => $my_page) {
     $form[$key] = bibdk_my_page_customize_form_elements($my_page);
   }
