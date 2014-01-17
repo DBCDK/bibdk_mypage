@@ -157,6 +157,7 @@ function bibdk_mypage_bibdk_mypage_tabs($max_rows) {
     'title' => t('Edit settings'),
     'href' => 'user/' . $user->uid . '/edit',
   );
+  $ret['bibdk_mypage']['weight'] = 35;
   return $ret;
 }
 
