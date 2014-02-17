@@ -1,23 +1,6 @@
 <?php
 
 /**
- * @file
- * Create a profile2 tab that provide a hook for other modules to supply an overview of the user's data.
- */
-
-/**
- * Implements user_profile_tabs (
- * @see ding_user.module)
- */
-function bibdk_mypage_user_profile2_tabs() {
-  $ret = new stdClass();
-  $ret->label = t('My page');
-  $ret->form = 'bibdk_mypage_form';
-  $ret->type = 'bibdk_mypage';
-  return $ret;
-}
-
-/**
  * Implements hook_menu().
  * Sets up menu items.
  */
@@ -42,6 +25,8 @@ function bibdk_mypage_form($form) {
 
   $max_rows = variable_get('bibdk_mypage_max_items', 3);
   $my_pages = module_invoke_all('bibdk_mypage_tabs', $max_rows);
+
+  uasort($my_pages, 'drupal_sort_weight');
 
   foreach ($my_pages as $key => $my_page) {
     $form[$key] = bibdk_my_page_customize_form_elements($my_page);
@@ -136,28 +121,6 @@ function bibdk_mypage_theme() {
   return $bibdk_mypage_theme_array;
 }
 
-/**
- * Implements hook_menu_alter().
- */
-function bibdk_mypage_menu_alter(&$items) {
-  $items['user']['page callback'] = '_bibdk_mypage_user_page';
-  $items['user']['file'] = 'bibdk_mypage.module';
-  $items['user']['module'] = 'bibdk_mypage';
-}
-
-/**
- * callback for /user. See bibdk_mypage_menu_alter()
- */
-function _bibdk_mypage_user_page() {
-  global $user;
-  if ($user->uid) {
-    menu_set_active_item('user/' . $user->uid . '/edit/bibdk_mypage');
-    return menu_execute_active_handler('user/' . $user->uid . '/edit/bibdk_mypage', TRUE);
-  }
-  else {
-    return drupal_get_form('user_login');
-  }
-}
 
 /**
  * Implements hook_bibdk_mypage_tabs().
@@ -172,8 +135,19 @@ function bibdk_mypage_bibdk_mypage_tabs($max_rows) {
     'title' => t('Edit settings'),
     'href' => 'user/' . $user->uid . '/edit',
   );
+  $ret['bibdk_mypage']['weight'] = 35;
   return $ret;
 }
+
+/**
+ * Implements hook_user_view
+ *
+ * Add the mypage content to user user profile page.
+ * */
+function bibdk_mypage_user_view($account, $view_mode, $langcode) {
+  $account->content = drupal_get_form('bibdk_mypage_form');
+}
+
 
 function bibdk_mypage_my_page_get_rows($max_rows) {
   global $user;

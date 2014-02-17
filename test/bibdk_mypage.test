@@ -20,56 +20,49 @@ class BibdkMypageTestCase extends DrupalWebTestCase {
     // $this->profile = 'testing';
 
     // Enable any modules required for the test
-    $modules = array('profile2', 'bibdk_mypage', 'ding_user', 'bibdk_test_provider', 'openagency_webservice_mockup');
+    $modules = array('bibdk_mypage', 'bibdk_mypage_api_test'); //, 'ding_user', 'bibdk_provider', 'bibdk_webservice', 'bibdk_mypage_api_test');
     parent::setUp($modules);
-
-    // Create and log in our user.
-    $this->standard_user = $this->drupalCreateUser();
-    // $this->drupalLogin($this->standard_user);
-
+    variable_set('bibdk_provider_webservice_url', $this->getAbsoluteUrl('bibdk_webservice'));
+    variable_set('bibdk_provider_security_code', 'securityCode');
   }
 
-  public function testBibdkMypage() {
+  public function testRunner(){
+    $this->testMypageTabs();
+    $this->testWeight();
+  }
 
-    //first disable module
-    module_disable(array('bibdk_mypage'));
-    // assert that profiletype does not exist
-    $profile_type = 'bibdk_mypage';
-    $type = profile2_get_types($profile_type);
-    $this->assertFalse($type, $profile_type.' is disabled');
+  private function testMypageTabs() {
 
-    // enable module
-    module_enable(array('bibdk_mypage'));
-    // we have to submit the user_login_block form to log in as provider user
-    $edit['name'] = 'testuser';
-    $edit['pass'] = 'password';
-    $this->drupalPost('user/login', $edit, t('Log in'), array(), array(), 'user-login', NULL);
+    $this->privileged_user = $this->drupalCreateUser(array(
+      'access user profiles',
+    ));
 
-    // assert that the profiletype has been created when user logs in
-    $type = profile2_get_types($profile_type);
-    $this->assertEqual($type->type, $profile_type, 'profile_type "' . $profile_type . '" has been created');
-
-    // get the drupal user just logged in
-    $result = db_query('SELECT uid FROM {sessions} WHERE uid != 0');
-    $users = array();
-    foreach ($result as $row) {
-      $users[] = user_load($row->uid);
-    }
-
-    // test user is ding_user
-    $this->assertTrue(ding_user_is_provider_user($users[0]), 'user is logged in as ding_user');
-
-    // assert that correct profile has been bound to user
-    $profile_types = profile2_load_by_user($users[0]);
-    $this->assertTrue(in_array($profile_type, array_keys($profile_types)), $profile_type . ' has been bound to user');
-
-    global $base_url;
-    variable_set('agency_search_url', $base_url.'/openagency_webservice/');
-    $this->drupalGet('user/'.$users[0]->uid.'/edit/'.$profile_type);
-
+    $this->drupalLogin($this->privileged_user);
+    //$this->drupalGet('user/2');
     // assert that profile tab is shown
-    $this->assertText('My page','"My page" profile tab is set');
+    $this->drupalGet('user/2');
+    $this->assertText('Account','"My page" Account tab is set');
+
+    // Test if hook_bibdk_mypage_tab works
+    $this->assertText('Test tab 1');
+    $this->assertLink(t('Go to test tab 1'));
+    $this->assertText('Test tab 2');
+    $this->assertLink(t('Go to test tab 2'));
+    $this->assertText('Test tab 3');
+    $this->assertLink(t('Go to test tab 3'));
 
   }
 
+  private function testWeight() {
+    $form = bibdk_mypage_form(array());
+    $keys = array_keys($form);
+
+    $expected_result = array (
+      0 => 'tab_2',
+      1 => 'tab_3',
+      2 => 'tab_1',
+      3 => 'bibdk_mypage',
+    );
+    $this->assertEqual($keys, $expected_result, 'Weight is set correcty');
+  }
 }
