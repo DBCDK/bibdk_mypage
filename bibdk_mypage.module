@@ -23,7 +23,6 @@ function bibdk_mypage_menu() {
 */
 function bibdk_mypage_menu_alter(&$items) {
   $items['user']['page callback'] = 'bibdk_mypage_page';
-  $items['user']['title callback'] = 'bibdk_mypage_title';
   $items['user']['module'] = 'bibdk_mypage';
   $items['user']['file'] = FALSE;
 }
@@ -56,15 +55,6 @@ function bibdk_mypage_page() {
   }
 }
 
-
-/**
- * Title callback for path /user.
- *
- */
-function bibdk_mypage_title() {
-    return user_is_logged_in() ? t('mypage_my_account_link', array(), array('context' => 'bibdk_mypage')) : t('mypage_user_account_link', array(), array('context' => 'bibdk_mypage'));
-  // bibdk_modal/nojs/login
-}
 
 
 /**
