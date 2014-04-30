@@ -22,9 +22,11 @@ function bibdk_mypage_menu() {
 * Implements hook_menu_alter().
 */
 function bibdk_mypage_menu_alter(&$items) {
-  $items['user']['page callback'] = 'bibdk_mypage_page';
-  $items['user']['module'] = 'bibdk_mypage';
-  $items['user']['file'] = FALSE;
+  if ( module_exists('bibdk_modal') ) {
+    $items['user']['page callback'] = 'bibdk_mypage_page';
+    $items['user']['module'] = 'bibdk_mypage';
+    $items['user']['file'] = FALSE;
+  }
 }
 
 
