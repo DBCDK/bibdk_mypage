@@ -124,14 +124,6 @@ function bibdk_my_page_customize_form_elements($my_page) {
   }
 
   if (isset($my_page['link'])) {
-    /*$form['link'] = array(
-      '#type' => 'container',
-      '#attributes' => array(
-        'class' => array(
-          'bibdk-mypage-link',
-        ),
-      ),
-    );*/
     $form['link']= array(
       '#prefix'  => '<span class="bibdk-mypage-link" >',
       '#suffix' => '</span>');
@@ -170,14 +162,6 @@ function bibdk_my_page_customize_form_elements($my_page) {
         ),
         '#suffix' => '</p>',
       );
-/*      
-      $form['help_link_wrapper']['help_link'] = array(
-        '#type' => 'link',
-        '#title' => '?',
-        '#href' => 'https://bibliotek.dk/da/overlay/help/22 target="_blank"',
-      );
- */    
-      
       
       $form['help_text_wrapper'] = array(
         '#type' => 'container',
