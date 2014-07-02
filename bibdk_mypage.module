@@ -257,3 +257,10 @@ function bibdk_mypage_my_page_get_rows($max_rows) {
   );
   return $ret;
 }
+
+/**
+ * Implements hook to user_help_list
+ * */
+function bibdk_mypage_user_help_list() {
+  return array('account_mypage_help_key'=>'account_mypage_help_label');
+}

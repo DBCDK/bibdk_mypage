@@ -31,9 +31,3 @@ function bibdk_mypage_admin_submit($form, &$form_state) {
   drupal_set_message(t('Value saved', array(), array('context' => 'bibdk_mypage')), 'status');
 }
 
-/**
- * Implements hook to user_help_list
- * */
-function bibdk_mypage_user_help_list() {
-  return array('account_mypage_help_key'=>'account_mypage_help_label');
-}
