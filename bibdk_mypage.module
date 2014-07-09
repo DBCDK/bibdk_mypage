@@ -124,14 +124,10 @@ function bibdk_my_page_customize_form_elements($my_page) {
   }
 
   if (isset($my_page['link'])) {
-    $form['link'] = array(
-      '#type' => 'container',
-      '#attributes' => array(
-        'class' => array(
-          'bibdk-mypage-link',
-        ),
-      ),
-    );
+    $form['link']= array(
+      '#prefix'  => '<span class="bibdk-mypage-link" >',
+      '#suffix' => '</span>');
+        
     $form['link']['link_profile2_tab'] = array(
       '#type' => 'link',
       '#title' => $my_page['link']['title'],
@@ -147,6 +143,58 @@ function bibdk_my_page_customize_form_elements($my_page) {
       ),
     );
   }
+  
+  // helptext elements 
+  if ( isset($my_page['help_text_key']) ) {
+    $helptext = bibdk_help_get_help_text_from_db($my_page['help_text_key']);
+    if (isset($helptext)) {
+     
+      $form['help_link_wrapper']['help_link'] = array(
+        '#prefix' => '<p class="helptext popover-button" title=$helptext>',
+        '#type' => 'link',
+        '#title' => '?',
+        '#title_display' => 'invisible',
+        '#href' => '#',
+        '#options' => array(
+          'attributes' => array(
+            'title' => $helptext,
+          ),
+        ),
+        '#suffix' => '</p>',
+      );
+      
+      $form['help_text_wrapper'] = array(
+        '#type' => 'container',
+        '#attributes' => array(
+          'class' => array(
+            'popover', 'element-wrapper', 'visuallyhidden', 'linkme-wrapper',
+          ),
+        ),
+      );
+
+      $form['help_text_wrapper']['help_text_msg'] = array(
+        '#prefix' => '<p class="user-msg">',
+        '#markup' => $helptext, 
+        '#suffix' => '</p>',
+      );
+
+      $form['help_text_wrapper']['help_link_close'] = array(
+        '#type' => 'link',
+        '#title' => '',
+        '#title_display' => 'invisible',
+        '#href' => '#',
+        '#options' => array(
+          'attributes' => array(
+            'tabindex' => '0',
+            'class' => array(
+              'close', 'icon', 'icon-left', 'icon-red-x',
+            ),
+          ),
+        ),
+      );
+    }
+  }
+
   return $form;
 }
 
@@ -185,10 +233,10 @@ function bibdk_mypage_bibdk_mypage_tabs($max_rows) {
     'href' => 'user/' . $user->uid . '/edit',
   );
   $ret['bibdk_mypage']['weight'] = 35;
+  $ret['bibdk_mypage']['help_text_key'] = 'account_mypage_help_key';
 
   return $ret;
 }
-
 
 /**
  * Implements hook_user_view
@@ -208,4 +256,11 @@ function bibdk_mypage_my_page_get_rows($max_rows) {
     'value_row' => (isset($languages) && isset($languages[1][$user->language]->native)) ? $languages[1][$user->language]->native : t('undefined'),
   );
   return $ret;
+}
+
+/**
+ * Implements hook to user_help_list
+ * */
+function bibdk_mypage_user_help_list() {
+  return array('account_mypage_help_key'=>'account_mypage_help_label');
 }

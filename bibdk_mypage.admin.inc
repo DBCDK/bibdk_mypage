@@ -30,3 +30,4 @@ function bibdk_mypage_admin_submit($form, &$form_state) {
   variable_set('bibdk_mypage_max_items', (int) abs($value));
   drupal_set_message(t('Value saved', array(), array('context' => 'bibdk_mypage')), 'status');
 }
+
