@@ -5,6 +5,7 @@ core = 7.x
 version = 7.x-0.6
 
 dependencies[] = profile2
+dependencies[] = bibdk_help
 
 files[] = test/bibdk_mypage.test
 files[] = bibdk_mypage.api.php
